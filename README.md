@@ -1,22 +1,24 @@
 # Cybersecurity Portfolio
 
-A collection of hands-on security labs and assignments completed as part of my cybersecurity studies. Each project covers a different area of offensive and defensive security.
-
----
+A collection of hands-on security labs and projects completed as part of my 
+cybersecurity studies. Each project covers a different area of offensive and 
+defensive security.
 
 ## Projects
 
-### 1. Security Simulation Lab — Attack, Defend & Monitor
-Full-cycle security simulation covering reconnaissance, web application attacks, SSH brute force, WAF defence, honeypot deception and centralised log monitoring using the ELK Stack.
+### 1. Network Attack Detection & Reporting
+Deployed a Cowrie SSH honeypot on Ubuntu, performed Nmap reconnaissance 
+and SSH brute force from Kali Linux, captured network traffic with Wireshark, 
+and documented all findings in a professional incident report.
 
-**Tools:** Nmap · sqlmap · Metasploit · DVWA · ModSecurity · Cowrie · ELK Stack
+**Tools:** Cowrie · Nmap · Wireshark · iptables · Kali Linux
 
-[View Project](#) ← *update this link once you create the security-lab repo*
+[View Project](./project-1-honeypot/)
 
 ---
 
 ### 2. More projects coming soon
-Additional assignments will be added here as they are published.
+Additional projects will be added here as they are completed.
 
 ---
 
@@ -28,12 +30,9 @@ Additional assignments will be added here as they are published.
 - SIEM — ELK Stack, Filebeat, Kibana
 - Offensive tooling — Nmap, Metasploit, sqlmap
 - Incident response documentation
-- Virtualisation — UTM 
----
+- Virtualisation — UTM
 
 ## Author
 
-Adigun| Cybersecurity Student
+Adigun | Cybersecurity Student
 https://www.linkedin.com/in/olamilekan-adigun/
----
-
