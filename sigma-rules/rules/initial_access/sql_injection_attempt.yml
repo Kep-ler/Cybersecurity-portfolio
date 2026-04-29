@@ -1,0 +1,28 @@
+title: SQL Injection Attempt Detected
+id: c3d4e5f6-a7b8-9012-cdef-123456789012
+status: experimental
+description: >
+  Detects SQL injection probes in Apache web server access logs,
+  indicative of automated tools such as sqlmap. Triggers on a single
+  request containing common SQL injection strings in URL parameters.
+author: Adigun
+date: 2026/04/28
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  product: webserver
+  service: apache
+detection:
+  selection:
+    message|contains:
+      - 'UNION SELECT'
+      - 'OR 1=1'
+      - '%27'
+      - '--'
+  condition: selection
+falsepositives:
+  - Penetration testers running authorised assessments
+  - Web application security scanners
+  - Developers testing input validation
+level: high
