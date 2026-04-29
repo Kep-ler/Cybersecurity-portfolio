@@ -1,0 +1,25 @@
+title: Network Port Scan Detected
+id: b2c3d4e5-f6a7-8901-bcde-f12345678901
+status: experimental
+description: >
+  Detects repeated connection attempts from a single source IP
+  across multiple destination ports, indicative of network scanning
+  tools such as Nmap. Triggers on 10 or more blocked connection
+  attempts from one source IP within a short time window.
+author: Adigun
+date: 2026/04/28
+tags:
+  - attack.discovery
+  - attack.t1046
+logsource:
+  product: linux
+  service: syslog
+detection:
+  selection:
+    message|contains: 'UFW BLOCK'
+  condition: selection | count() > 10
+falsepositives:
+  - Network monitoring tools performing legitimate discovery
+  - Vulnerability scanners run by internal security teams
+  - Misconfigured applications probing multiple ports
+level: medium
