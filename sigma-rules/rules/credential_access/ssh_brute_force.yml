@@ -1,0 +1,28 @@
+title: SSH Brute Force Attack Detected
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+status: experimental
+description: >
+  Detects repeated SSH authentication failures from a single source IP,
+  indicative of brute force tools such as Hydra. Catches both failed
+  password attempts and invalid user enumeration. Threshold is 10 failures
+  within 60 seconds.
+author: Adigun
+date: 2026/04/28
+tags:
+  - attack.credential_access
+  - attack.t1110.001
+logsource:
+  product: linux
+  service: auth
+detection:
+  selection:
+    process: sshd
+    message|contains:
+      - 'Failed password'
+      - 'Invalid user'
+  condition: selection | count() > 10
+falsepositives:
+  - Legitimate users mistyping passwords repeatedly
+  - Automated scripts with misconfigured credentials
+  - Legitimate admin testing with non-existent usernames
+level: high
