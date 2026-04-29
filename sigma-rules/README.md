@@ -13,6 +13,7 @@ hands-on attack simulation — not copied from existing rule sets.
 | [SSH Brute Force](rules/credential_access/ssh_brute_force.yml) | Credential Access | T1110.001 | High |
 | [Network Port Scan](rules/discovery/nmap_port_scan.yml) | Discovery | T1046 | Medium |
 | [SQL Injection Attempt](rules/initial_access/sql_injection_attempt.yml) | Initial Access | T1190 | High |
+| [Phishing Malicious Attachment](rules/intial_access/phishing_malicious_attachment.yml) | Initial Access | T1566.001 | High |
 
 ## Lab Environment
 
