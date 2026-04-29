@@ -1,0 +1,25 @@
+title: phishing
+status: experimental
+description: Adversaries may send victims emails containing malicious attachments or links, typically to execute malicious code on victim systems
+Id:  d4e5f6a7-b8c9-0123-defa-234567890123
+author: self
+date: 29/04/2026
+tags: 
+  -  attack.t1566.001
+  -  attack.initial_access
+logsource: 
+  product: linux 
+  service: postfix
+detection: 
+  selection:
+    Message|contains:
+      -  ’.exe’
+      - ’.scr’
+      - ’.pif’
+      - ’.cpl’
+      - ’.vbs’    
+  condition: selection
+level: high
+falsepositives:
+  - allowed senders transmitting legitimate executables
+  - internal IT teams distributing software via email
