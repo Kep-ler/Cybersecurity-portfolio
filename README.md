@@ -47,6 +47,17 @@ distinct phases of an attack chain.
 
 [View Sigma Rules](sigma-rules/README.md)
 
+## 4. IAM Least Privilege Automation
+
+Implemented IAM Access Analyzer and a custom least-privilege automation pipeline on AWS. 
+Analyzed 90 days of CloudTrail logs to identify over-privileged IAM roles, wrote a Python 
+script using boto3 to automate unused permission detection, and applied Terraform 
+infrastructure-as-code to refactor roles into narrow, task-specific policies. Reduced 
+permissions by 96% and eliminated all wildcard access.
+
+Tools: AWS IAM Access Analyzer · CloudTrail · Python boto3 · Terraform · AWS CLI v2 · Kali Linux
+
+[View Project](IAM-Least-Privilege-Automation/)
 ---
 
 ## Skills
@@ -59,6 +70,10 @@ distinct phases of an attack chain.
 - Offensive tooling — Nmap, Metasploit, sqlmap, Hydra
 - Incident response documentation
 - Virtualisation — UTM (Apple Silicon)
+- AWS IAM security and least-privilege automation
+- CloudTrail log analysis
+- Terraform infrastructure-as-code
+- boto3 SDK
 
 ---
 
