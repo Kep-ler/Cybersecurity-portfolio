@@ -1,0 +1,21 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyWildcardIAMPolicies",
+      "Effect": "Deny",
+      "Action": [
+        "iam:CreatePolicy",
+        "iam:CreatePolicyVersion",
+        "iam:PutRolePolicy",
+        "iam:AttachRolePolicy"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringLike": {
+          "iam:PolicyDocument": "*\"Action\":[\"*\"]"
+        }
+      }
+    }
+  ]
+}
