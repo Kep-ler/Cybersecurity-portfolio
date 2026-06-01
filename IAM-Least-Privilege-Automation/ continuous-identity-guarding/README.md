@@ -12,14 +12,19 @@ Service Control Policy to prevent wildcard permissions at organization level
 
 Architecture
 EventBridge Scheduler (every 30 days)
+
         ↓
 Lambda — iam-audit-lambda (Python 3.12, arm64)
+
         ↓
 IAM + CloudTrail analysis
+
         ↓
 SNS Topic
+
         ↓
 Email report
+
 
 
 **References
