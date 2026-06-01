@@ -30,7 +30,10 @@ Email report
 **References
 
 AWS Lambda Documentation
+
 AWS EventBridge Scheduler
+
 AWS SNS Documentation
+
 NIST SP 800-53 AC-6 Least Privilege**
 
