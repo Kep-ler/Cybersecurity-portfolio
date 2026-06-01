@@ -11,6 +11,10 @@ This project implements a least-privilege automation pipeline for AWS IAM. It an
 **Success metric:** Reduce High and Critical IAM Access Analyzer findings by 80% without breaking application functionality. **Achieved: 96% reduction.**
 
 ---
+- [Continuous Identity Guarding](IAM-Least-Privilege-Automation/continuous-identity-guarding/) 
+  — Lambda automation, ghost role detection, SNS reporting, SCP
+
+( project gets expanded )
 
 ## Stack
 
@@ -142,6 +146,3 @@ Compare output against pre-remediation report. Verify IAM Access Analyzer shows 
 - [MITRE ATT&CK T1078.004](https://attack.mitre.org/techniques/T1078/004/)
 
 ---
-
-*Sensitive values including account IDs, ARNs, and credentials have been removed. Never commit credentials or Terraform state files to version control.*
-
