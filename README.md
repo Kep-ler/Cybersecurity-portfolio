@@ -74,6 +74,10 @@ Tools: AWS IAM Access Analyzer · CloudTrail · Python boto3 · Terraform · AWS
 - CloudTrail log analysis
 - Terraform infrastructure-as-code
 - boto3 SDK
+- AWS Lambda and EventBridge scheduling
+- SNS notification pipelines
+- Cloud security automation at scale
+- Service Control Policy design
 
 ---
 
