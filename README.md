@@ -58,6 +58,8 @@ permissions by 96% and eliminated all wildcard access.
 Tools: AWS IAM Access Analyzer · CloudTrail · Python boto3 · Terraform · AWS CLI v2 · Kali Linux
 
 [View Project](IAM-Least-Privilege-Automation/)
+- [Project Aegis: CSPM Engine](IAM-Least-Privilege-Automation/project-aegis/)
+  — Multi-service hardening: IAM, S3, Security Groups, Cross-Account Trust
 ---
 
 ## Skills
