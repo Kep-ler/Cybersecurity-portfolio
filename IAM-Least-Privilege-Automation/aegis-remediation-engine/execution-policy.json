@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AegisCrossAccountStsHandshake",
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Resource": "arn:aws:iam::*:role/Aegis-Security-Auditor"
+    },
+    {
+      "Sid": "AegisCentralLoggingAndTelemetry",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "sns:Publish"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
