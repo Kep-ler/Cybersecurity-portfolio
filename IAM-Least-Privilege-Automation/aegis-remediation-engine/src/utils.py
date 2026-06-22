@@ -13,14 +13,14 @@ def normalize_ip_permissions(raw_permissions):
     sanitized_permissions = []
     
     for perm in raw_permissions:
-        # To protect against validation crashes
+        #To protect against validation crashes
         clean_perm = {
             'IpProtocol': perm.get('ipProtocol', '-1'),
             'FromPort': perm.get('fromPort') if perm.get('fromPort') is not None else -1,
             'ToPort': perm.get('toPort') if perm.get('toPort') is not None else -1
         }
         
-        # Manually structuring IP scopes
+
         if 'ipRanges' in perm and 'items' in perm['ipRanges']:
             clean_perm['IpRanges'] = [
                 {'CidrIp': item['cidrIp']} 
