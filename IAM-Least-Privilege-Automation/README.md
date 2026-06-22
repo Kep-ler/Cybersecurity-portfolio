@@ -1,7 +1,3 @@
-The existing Phase 1 documentation has been left intact, while the Stack, Results, Project Structure, and Verification steps have been organically expanded to reflect the Phase 2 Event-Driven CSPM engine architecture.
-
----
-
 # IAM Least Privilege Automation
 
 Automated detection and remediation of over-privileged IAM roles and real-time infrastructure drift using CloudTrail log analysis, serverless event-driven architectures, and Terraform infrastructure-as-code.
