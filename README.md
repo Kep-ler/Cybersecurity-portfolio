@@ -47,20 +47,18 @@ distinct phases of an attack chain.
 
 [View Sigma Rules](sigma-rules/README.md)
 
-## 4. IAM Least Privilege Automation
+### 4. IAM Least Privilege Automation
 
-Implemented IAM Access Analyzer and a custom least-privilege automation pipeline on AWS. 
-Analyzed 90 days of CloudTrail logs to identify over-privileged IAM roles, wrote a Python 
-script using boto3 to automate unused permission detection, and applied Terraform 
-infrastructure-as-code to refactor roles into narrow, task-specific policies. Reduced 
-permissions by 96% and eliminated all wildcard access.
+Implemented IAM Access Analyzer and a custom least-privilege automation pipeline on AWS. Analyzed 90 days of CloudTrail logs to identify over-privileged IAM roles, wrote a Python script using boto3 to automate unused permission detection, and applied Terraform infrastructure-as-code to refactor roles into narrow, task-specific policies. Reduced permissions by 96% and eliminated all wildcard access.
 
-Tools: AWS IAM Access Analyzer · CloudTrail · Python boto3 · Terraform · AWS CLI v2 · Kali Linux
+**Tools:** AWS IAM Access Analyzer · CloudTrail · Python boto3 · Terraform · AWS CLI v2 · Kali Linux
 
 [View Project](IAM-Least-Privilege-Automation/)
-- [Project Aegis: CSPM Engine](IAM-Least-Privilege-Automation/project-aegis/)
-  — Multi-service hardening: IAM, S3, Security Groups, Cross-Account Trust
----
+
+**Sub-projects:**
+- [Continuous Identity Guarding](IAM-Least-Privilege-Automation/continuous-identity-guarding/) — Lambda automation, ghost role detection, SNS reporting, SCP
+- [Project Aegis: CSPM Engine](IAM-Least-Privilege-Automation/project-aegis/) — Multi-service hardening: IAM, S3, Security Groups, Cross-Account Trust
+- [Project Aegis Phase 3: Inline Policy Enforcement](IAM-Least-Privilege-Automation/project-aegis-phase3/) — OPA/Rego pre-deployment guardrails, proactive Lambda refactor
 
 ## Skills
 
