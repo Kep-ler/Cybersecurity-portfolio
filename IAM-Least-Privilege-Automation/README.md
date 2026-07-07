@@ -1,220 +1,122 @@
 # IAM Least Privilege Automation
 
-Automated detection and remediation of over-privileged IAM roles and real-time infrastructure drift using CloudTrail log analysis, serverless event-driven architectures, and Terraform infrastructure-as-code.
+This project is about building guardrails. Not just detecting problems after 
+they happen, but thinking like an attacker and closing gaps before they can 
+be exploited. It started as a one-time IAM audit and expanded into a 
+multi-phase cloud security pipeline covering identity, storage, network, 
+and policy enforcement.
+
+Built on AWS, Python, Terraform, and Open Policy Agent across five phases.
 
 ---
 
-## Overview
+## Phases
 
-This project implements a multi-phase security automation pipeline for AWS environments.
+### Phase 1 — Static Least Privilege Analysis
+Analyzed 90 days of CloudTrail logs to identify IAM roles carrying permissions 
+they had never used. Wrote a custom Python script using boto3 to automate the 
+detection, classify roles by risk level, and output a findings report. Applied 
+Terraform to replace broad AWS managed policies with narrow, task-specific ones.
 
-* **Phase 1 (Static Analysis):** Analyzes 90 days of CloudTrail activity to isolate unexercised permissions granted to IAM roles, classifies roles by risk level, and applies Terraform-based remediation to replace broad policies with narrow, task-specific variants.
-* **Phase 2 (Continuous Remediation):** Deploys a live, out-of-band Cloud Security Posture Management (CSPM) engine to intercept infrastructure mutations instantly, execute cross-account rollbacks via short-lived tokens, and stream telemetry data.
+Result: 67 permissions reduced to 3. Wildcard permissions eliminated entirely. 
+96% reduction. IAM Access Analyzer confirmed zero High or Critical findings.
 
-**Success metrics:**
+Tools: Python, boto3, Terraform, AWS CLI, CloudTrail, IAM Access Analyzer
 
-* Reduce High and Critical IAM Access Analyzer findings by 80% without breaking application functionality. **Achieved: 96% reduction.**
-* Drop the enterprise threat exploitation window from a 30-day scheduled audit timeline down to a sub-second frame. **Achieved: 337.38ms average auto-remediation response.**
-
----
-
-## Modules
-
-* [Phase 1: Static Least Privilege Analysis](terraform/) — Analysis script and baseline IAM policy remediation resources.
-* [Phase 2: Continuous Identity Guarding](continuous-identity-guarding/) — Real-time Lambda automation, dynamic Boto3 data serialization, multi-account STS handshakes, and Amazon SNS alerting hub.
-*-[Project Aegis Phase 4: Scaled Rego & Unit Testing](IAM-Least-Privilege-Automation/project-aegis-phase4/)
-  — Universal quantifiers, net.cidr_contains, automated OPA test suite
----
-
-## Stack
-
-* AWS IAM Access Analyzer (Principal Analysis — Unused Access)
-* AWS CloudTrail & Amazon EventBridge
-* Python 3 + Boto3 (AWS Lambda execution runtime)
-* Terraform v1.x
-* AWS STS (Cross-Account Security Brokerage)
-* Amazon SNS (Central Telemetry Hub)
-* AWS CLI v2
-* Kali Linux (aarch64)
+[View files](terraform/) · [Analysis script](analyze_iam.py)
 
 ---
 
-## How It Works
+### Phase 2 — Continuous Identity Guarding
+Converted the one-time script into a scheduled Lambda function that runs 
+every 30 days automatically. Added ghost role detection — any role with zero 
+activity older than 90 days gets flagged for decommissioning. Results delivered 
+by email via SNS after every run. Also documented a Service Control Policy 
+to prevent wildcard permissions from being created at the organization level.
 
-### Phase 1: Batch Remediation Workflow
+Tools: AWS Lambda, EventBridge, SNS, Python, boto3
 
-```text
-CloudTrail Logs (90 days)
-↓
-analyze_iam.py
-→ Enumerate all IAM roles
-→ Retrieve granted permissions per role
-→ Query CloudTrail for used permissions
-→ Compute unused = granted - used
-→ Classify risk (Critical / High / Medium / Low)
-→ Output JSON report
-↓
-Terraform
-→ Create narrow least-privilege policy
-→ Attach to role
-→ Remove broad managed policies
-↓
-IAM Access Analyzer
-→ Validate 0 High/Critical findings
+[View files](continuous-identity-guarding/)
 
-```
+---
 
-### Phase 2: Live Self-Healing Event Loop
+### Phase 3 — Project Aegis: CSPM Engine
+Expanded from IAM-only scanning into a full Cloud Security Posture Management 
+engine covering four domains: IAM privilege analysis, cross-account trust 
+relationships, S3 storage exposure, and network ingress controls. All findings 
+delivered in a single unified email report after every automated run.
 
-```text
-Infrastructure Drift Mutation (e.g., Public Port 22 Ingress Opened)
-↓
-AWS CloudTrail Event Capture
-↓
-Amazon EventBridge Pattern Filter (event-pattern.json match)
-↓
-AWS Lambda Ingestion Engine (lambda_function.py)
-→ Verify Zero-Trust boundary compliance
-→ Trigger cross-account aws_sts:AssumeRole handshake
-→ Invoke data serialization utility (camelCase to PascalCase payload alignment)
-→ Fire out-of-band mitigation (revoke_security_group_ingress)
-↓
-Amazon SNS Alert Channel (Dispatches real-time JSON metrics to SecOps team)
+Also built a real-time out-of-band remediation layer — when an insecure 
+security group or S3 misconfiguration is detected via CloudTrail and 
+EventBridge, the engine automatically rolls it back using cross-account 
+STS credentials. Remediation latency: 337ms.
 
-```
+Tools: AWS Lambda, EventBridge, CloudTrail, SNS, boto3, STS
+
+[View CSPM scanner](project-aegis/) · [View remediation engine](aegis-remediation-engine/)
+
+---
+
+### Phase 3.5 — Proactive Inline Policy Enforcement
+Shifted from reactive remediation to proactive blocking. Instead of fixing 
+misconfigurations after they reach AWS, this phase evaluates Terraform plans 
+before deployment using Open Policy Agent and Rego. If a plan defines a 
+security group with SSH or RDP open to the internet, the policy returns a 
+deny and the pipeline exits with a non-zero status. The resource never gets 
+created. Exposure window drops from 337ms to zero.
+
+Also refactored the Lambda function — removed all AWS mutation permissions 
+since there is nothing left to remediate, replaced with a lightweight 
+telemetry function that logs blocked attempts to SNS.
+
+Tools: OPA, Rego, Terraform, AWS Lambda, SNS, Kali Linux
+
+---
+
+### Phase 4 — Scaled Rego and Policy Unit Testing
+Hardened the policy engine for production use. Replaced named index 
+iteration with universal quantifiers so every array entry in a Terraform 
+plan gets evaluated, not just the first match. Replaced string-based CIDR 
+matching with net.cidr_contains — meaning a rule written as 0.0.0.0/1 
+gets caught just like 0.0.0.0/0, because it is doing network math instead 
+of text comparison. Wrote an automated unit test suite using OPA's native 
+testing framework to prove both directions: insecure configs get denied, 
+clean configs pass clean.
+
+Tools: OPA, Rego, Kali Linux
+
+[View files](project-aegis-phase4/)
 
 ---
 
 ## Results
 
-| Metric | Before | After | Reduction / Performance |
-| --- | --- | --- | --- |
-| Permissions granted | 67 | 3 | 96% reduction |
-| Wildcard permissions | 8 | 0 | 100% reduction |
-| Risk level | CRITICAL | HIGH | Successfully reduced |
-| Analyzer findings (High/Critical) | — | 0 | Target met |
-| **Remediation processing latency** | **30 days (Scheduled)** | **337.38 ms** | **99.99% reduction** |
-| **Local credential dependency** | **Static profiles** | **Dynamic STS** | **Zero-Trust verified** |
+| Metric | Start | End |
+|---|---|---|
+| IAM permissions on target role | 67 | 3 |
+| Wildcard permissions | 8 | 0 |
+| Risk classification | CRITICAL | Resolved |
+| Remediation latency (reactive) | 30 days | 337ms |
+| Exposure window (proactive) | 337ms | 0ms |
+| Manual runs required | Every time | 0 |
 
 ---
 
-## Project Structure
+## Stack
 
-```text
-iam-analyzer/
-├── analyze_iam.py                 # CloudTrail analysis script
-├── terraform/
-│   ├── provider.tf                # AWS provider configuration
-│   ├── main.tf                    # IAM policy remediation resources
-│   └── .gitignore                 # Excludes tfstate from version control
-└── continuous-identity-guarding/  # Phase 2: Real-time event-driven CSPM engine
-    ├── lambda_function.py         # Remediation engine & Boto3 data parser
-    ├── iam_policies.tf            # Cross-account & engine execution boundaries
-    ├── eventbridge_rule.tf        # CloudTrail filter and target trigger routing
-    └── README.md                  # Real-time engine deployment documentation
-
-```
-
----
-
-## Usage
-
-### Phase 1: Static Asset Remediation
-
-#### 1. Install dependencies
-
-```bash
-pip3 install boto3 --break-system-packages
-
-```
-
-#### 2. Configure AWS CLI
-
-```bash
-aws configure
-aws sts get-caller-identity
-
-```
-
-#### 3. Run analysis
-
-```bash
-python3 analyze_iam.py
-
-```
-
-#### 4. Detach existing broad policies
-
-```bash
-aws iam detach-role-policy --role-name [role-name] --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
-aws iam detach-role-policy --role-name [role-name] --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess
-aws iam detach-role-policy --role-name [role-name] --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
-
-```
-
-#### 5. Apply Terraform remediation
-
-```bash
-cd terraform/
-terraform init
-terraform plan
-terraform apply
-
-```
-
----
-
-### Phase 2: Live Ingestion Engine Deployment
-
-#### 1. Provision Event-Driven Infrastructure
-
-```bash
-cd continuous-identity-guarding/
-terraform init
-terraform apply -auto-approve
-
-```
-
-#### 2. Inject Compliance Drift Test Payload
-
-```bash
-aws lambda invoke \
-  --function-name Aegis-CSPM-Core-Engine \
-  --region us-east-1 \
-  --payload file://mock_sg_drift.json \
-  output.json
-
-```
-
-#### 3. Validate Live Telemetry Stream
-
-Review local terminal or Amazon CloudWatch log stream to confirm automated mitigation execution metrics match standard runtime patterns:
-
-```text
-START RequestId: 166ac039-c316-42fc-86e8-7b631179487c Version: $LATEST
-[INFO] Event received: {"source": "aws.ec2", "detail-type": "AWS API Call via CloudTrail"...}
-[WARN] Compliance violation: 0.0.0.0/0 ingress opened on sg-0a123b45678cd90ef in account 222222222222!
-[INFO] Successfully revoked non-compliant permissions from sg-0a123b45678cd90ef
-END RequestId: 166ac039-c316-42fc-86e8-7b631179487c
-REPORT RequestId: 166ac039-c316-42fc-86e8-7b631179487c  Duration: 337.38 ms  Billed Duration: 338 ms  Memory Used: 103 MB
-
-```
-
----
-
-## Key Notes
-
-* **Data Normalization Necessary:** CloudTrail output payloads track object variables via camelCase keys, while Boto3 request stubs demand strict PascalCase styling. The Phase 2 engine abstracts a translation layer (`normalize_ip_permissions`) internally to handle dictionary schema differences out-of-band and protect against `ParamValidation` runtime crashes.
-* **Zero-Trust Profile Design:** Local operator configurations (`kepler@kali`) are denied permission to touch cross-account backend systems manually. System handshakes are managed natively on the AWS core event backbone via transient STS access tokens, preventing local desktop credential leaks from compromising account security boundaries.
-* **Audit Baseline Requisite:** Requires CloudTrail enabled with Management Events (Read + Write) active prior to executing metrics compilation routines.
-* **Wildcard Classifications:** Wildcard permissions (`s3:*`, `ec2:*`) are systematically categorized as `CRITICAL` risk posture exposures regardless of historical logging usage parameters.
+AWS IAM Access Analyzer, CloudTrail, EventBridge, Lambda, SNS, STS,
+Python 3, boto3, Terraform, Open Policy Agent, Rego, AWS CLI v2,
+Kali Linux (aarch64)
 
 ---
 
 ## References
 
-* [AWS IAM Access Analyzer User Guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html)
-* [AWS CloudTrail Architecture Documentation](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html)
-* [Amazon EventBridge Rule Resource Specifications](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule)
-* [NIST SP 800-53 — AC-6 Least Privilege Standard Enforcement](https://csrc.mitre.org/publications/detail/sp/800-53/rev-5/final)
-* [MITRE ATT&CK Framework — T1078.004 Cloud Accounts Exploitation](https://attack.mitre.org/techniques/T1078/004/)
+- [AWS IAM Access Analyzer](https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html)
+- [AWS CloudTrail](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html)
+- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
+- [Open Policy Agent](https://www.openpolicyagent.org/docs/latest/)
+- [NIST SP 800-53 AC-6 Least Privilege](https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final)
+- [MITRE ATT&CK T1078.004](https://attack.mitre.org/techniques/T1078/004/)
+
+---
