@@ -22,7 +22,8 @@ This project implements a multi-phase security automation pipeline for AWS envir
 
 * [Phase 1: Static Least Privilege Analysis](terraform/) — Analysis script and baseline IAM policy remediation resources.
 * [Phase 2: Continuous Identity Guarding](continuous-identity-guarding/) — Real-time Lambda automation, dynamic Boto3 data serialization, multi-account STS handshakes, and Amazon SNS alerting hub.
-
+*-[Project Aegis Phase 4: Scaled Rego & Unit Testing](IAM-Least-Privilege-Automation/project-aegis-phase4/)
+  — Universal quantifiers, net.cidr_contains, automated OPA test suite
 ---
 
 ## Stack
