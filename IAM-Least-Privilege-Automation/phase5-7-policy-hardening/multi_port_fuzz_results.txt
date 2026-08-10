@@ -1,0 +1,7 @@
+aegis_guardrail_test.rego:
+data.aegis_test.test_deny_ssh_open: PASS (4.596377ms)
+data.aegis_test.test_deny_db_open: PASS (614.667µs)
+data.aegis_test.test_deny_port_range_overlap: PASS (3.969876ms)
+data.aegis_test.test_allow_clean_sg: PASS (232.5µs)
+--------------------------------------------------------------------------------
+PASS: 4/4
