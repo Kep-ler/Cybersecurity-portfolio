@@ -1,0 +1,63 @@
+name: Aegis Terraform Guardrail
+
+on:
+  pull_request:
+    paths:
+      - "IAM-Least-Privilege-Automation/phase5-7-policy-hardening/**"
+      - ".github/workflows/aegis-guardrail.yml"
+
+  push:
+    branches:
+      - main
+    paths:
+      - "IAM-Least-Privilege-Automation/phase5-7-policy-hardening/**"
+      - ".github/workflows/aegis-guardrail.yml"
+
+jobs:
+  policy-check:
+    name: Terraform Security Policy Check
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: IAM-Least-Privilege-Automation/phase5-7-policy-hardening/tf-test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.3"
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan.binary
+
+      - name: Convert Terraform plan to JSON
+        run: terraform show -json tfplan.binary > tfplan.json
+
+      - name: Install Conftest
+        working-directory: ${{ github.workspace }}
+        run: |
+          curl -L \
+            https://github.com/open-policy-agent/conftest/releases/download/v0.50.0/conftest_0.50.0_Linux_x86_64.tar.gz \
+            -o conftest.tar.gz
+
+          tar -xzf conftest.tar.gz
+          sudo mv conftest /usr/local/bin/conftest
+
+      - name: Verify Aegis policy tests
+        working-directory: ${{ github.workspace }}/IAM-Least-Privilege-Automation/phase5-7-policy-hardening
+        run: |
+          conftest verify --policy .
+
+      - name: Evaluate Terraform plan
+        working-directory: ${{ github.workspace }}/IAM-Least-Privilege-Automation/phase5-7-policy-hardening
+        run: |
+          conftest test \
+            --policy . \
+            tf-test/tfplan.json
