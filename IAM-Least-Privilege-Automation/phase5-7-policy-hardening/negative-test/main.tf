@@ -8,12 +8,19 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region                      = "us-east-1"
+  access_key                  = "test"
+  secret_key                  = "test"
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  skip_requesting_account_id  = true
+  skip_region_validation      = true
 }
 
 resource "aws_security_group" "test_sg" {
   name        = "aegis-negative-test"
   description = "Intentionally insecure configuration for Aegis testing"
+  vpc_id      = "vpc-00000000000000000"
 }
 
 resource "aws_security_group_rule" "bad_ssh" {
