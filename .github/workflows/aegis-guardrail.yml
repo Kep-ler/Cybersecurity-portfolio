@@ -18,10 +18,6 @@ jobs:
     name: Terraform Security Policy Check
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: IAM-Least-Privilege-Automation/phase5-7-policy-hardening/tf-test
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,17 +27,21 @@ jobs:
         with:
           terraform_version: "1.6.3"
 
-      - name: Terraform Init
-        run: terraform init -input=false
+      - name: Setup positive Terraform fixture
+        working-directory: IAM-Least-Privilege-Automation/phase5-7-policy-hardening/tf-test
+        run: |
+          terraform init -input=false
+          terraform plan -input=false -out=tfplan.binary
+          terraform show -json tfplan.binary > tfplan.json
 
-      - name: Terraform Plan
-        run: terraform plan -input=false -out=tfplan.binary
-
-      - name: Convert Terraform plan to JSON
-        run: terraform show -json tfplan.binary > tfplan.json
+      - name: Setup negative Terraform fixture
+        working-directory: IAM-Least-Privilege-Automation/phase5-7-policy-hardening/negative-test
+        run: |
+          terraform init -input=false
+          terraform plan -input=false -out=tfplan.binary
+          terraform show -json tfplan.binary > tfplan.json
 
       - name: Install Conftest
-        working-directory: ${{ github.workspace }}
         run: |
           curl -L \
             https://github.com/open-policy-agent/conftest/releases/download/v0.50.0/conftest_0.50.0_Linux_x86_64.tar.gz \
@@ -51,13 +51,36 @@ jobs:
           sudo mv conftest /usr/local/bin/conftest
 
       - name: Verify Aegis policy tests
-        working-directory: ${{ github.workspace }}/IAM-Least-Privilege-Automation/phase5-7-policy-hardening
+        working-directory: IAM-Least-Privilege-Automation/phase5-7-policy-hardening
         run: |
           conftest verify --policy .
 
-      - name: Evaluate Terraform plan
-        working-directory: ${{ github.workspace }}/IAM-Least-Privilege-Automation/phase5-7-policy-hardening
+      - name: Positive Terraform regression test
+        working-directory: IAM-Least-Privilege-Automation/phase5-7-policy-hardening
         run: |
-          conftest test \
-            --policy . \
-            tf-test/tfplan.json
+          conftest test --policy . tf-test/tfplan.json
+
+      - name: Negative Terraform regression test
+        working-directory: IAM-Least-Privilege-Automation/phase5-7-policy-hardening
+        shell: bash
+        run: |
+          set +e
+
+          output=$(conftest test --policy . negative-test/tfplan.json 2>&1)
+          rc=$?
+
+          echo "$output"
+
+          if [ "$rc" -ne 1 ]; then
+            echo "ERROR: insecure Terraform fixture did not produce the expected DENY."
+            echo "Expected exit code: 1"
+            echo "Actual exit code: $rc"
+            exit 1
+          fi
+
+          if ! echo "$output" | grep -q "DENY:"; then
+            echo "ERROR: Conftest exited with code 1, but no DENY result was produced."
+            exit 1
+          fi
+
+          echo "Negative regression test correctly denied the insecure configuration."
